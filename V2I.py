@@ -4,7 +4,7 @@ import os
 import glob
 from PIL import Image
 
-def v2i(video_paths, video_names):
+def v2i(video_paths, video_names, n ):
     for path, vn in zip(video_paths, video_names):
 
         # Read the video from specified path
@@ -26,22 +26,24 @@ def v2i(video_paths, video_names):
 
             # reading from frame
             ret, frame = cam.read()
+            if currentframe % n == 0:
+                if ret:
+                    # if video is still left continue creating images
+                    name = "./" + vn + "/" + vn + "_%06d.jpg" % currentframe
+                    if currentframe % 100 == 0:
+                        print('Creating... ' + name)
 
-            if ret:
-                # if video is still left continue creating images
-                name = "./" + vn + "/" + vn + "_%06d.jpg" % currentframe
-                if currentframe % 100 == 0:
+                    # writing the extracted images /Image.open(frame).resize()
+                    cv2.imwrite(name, frame)
+
+                    # increasing counter so that it will
+                    # show how many frames are created
+                    currentframe += 1
+                else:
                     print('Creating... ' + name)
-
-                # writing the extracted images /Image.open(frame).resize()
-                cv2.imwrite(name, frame)
-
-                # increasing counter so that it will
-                # show how many frames are created
-                currentframe += 1
+                    break
             else:
-                print('Creating... ' + name)
-                break
+                currentframe += 1
         cam.release()
     # Release all space and windows once done
 
@@ -65,6 +67,18 @@ if __name__ == '__main__':
 
     os.chdir("./datasets/car")
     paths = os.getcwd()
+    video_paths = glob.glob(paths + '/v3.mp4')
+    video_names = []
+    for video in os.listdir():
+        if '.mp4' in video:
+            print(video)
+            video_names.append("testImage")
+
+    v2i(video_paths, video_names, 30)
+
+    '''
+    os.chdir("./datasets/car")
+    paths = os.getcwd()
     video_paths = glob.glob(paths + '/*.mp4')
     video_names = []
     for video in os.listdir():
@@ -74,5 +88,7 @@ if __name__ == '__main__':
 
             
     v2i(video_paths, video_names)
+    '''
 
-    # show_video(video_names[2]+'.mp4')
+
+    #show_video(video_names[2]+'.mp4')
