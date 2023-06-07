@@ -36,8 +36,7 @@ while cv2.waitKey(33) < 0:
 capture.release()
 cv2.destroyAllWindows()
 '''
-
-
+'''
 if __name__ == '__main__' :
     from ultralytics import YOLO
 
@@ -48,5 +47,38 @@ if __name__ == '__main__' :
     # Use the model
     model.train(data="coco128.yaml", epochs=3)  # train the model
     metrics = model.val()  # evaluate model performance on the validation set
-    results = model("https://ultralytics.com/images/bus.jpg")  # predict on an image
+    # results = model("https://ultralytics.com/images/bus.jpg")  # predict on an image
+    results = model(os.getcwd()+"/datasets/car/testImage/testImage_000000.jpg")  # predict on an image
+
     path = model.export(format="onnx")  # export the model to ONNX format
+
+'''
+
+import cv2
+import os
+from ultralytics import  YOLO
+
+model = YOLO("yolov8n.pt")
+
+video_paths = os.getcwd() + "/datasets/car/v3.mp4"
+cap = cv2.VideoCapture(video_paths)
+
+while cap.isOpened():
+    success, frame = cap.read()
+
+    if success:
+        results = model(frame)
+
+        annotated_frame = results[0].plot()
+
+        cv2.imshow("YOLOv8 inference",annotated_frame)
+
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
+    else:
+        break
+cap.release()
+cv2.destroyAllWindows()
+
+
+
